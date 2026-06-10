@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NightWave Player</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#0b0b0b;
+    color:#fff;
+}
+
+/* NAVBAR */
+
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:18px 30px;
+
+    position:sticky;
+    top:0;
+
+    z-index:999;
+
+    background:rgba(15,15,15,.6);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    color:#e50914;
+}
+
+.home-btn{
+    padding:10px 18px;
+    border:none;
+    border-radius:12px;
+
+    background:#1a1a1a;
+    color:#fff;
+
+    cursor:pointer;
+}
+
+/* PLAYER */
+
+.player-section{
+    max-width:1400px;
+    margin:auto;
+    padding:25px;
+}
+
+.player-wrapper{
+    position:relative;
+    width:100%;
+}
+
+#videoPlayer{
+    width:100%;
+    aspect-ratio:16/9;
+
+    background:#000;
+
+    border-radius:20px;
+    overflow:hidden;
+}
+
+/* OVERLAY */
+
+.overlay{
+    position:absolute;
+
+    left:25px;
+    bottom:25px;
+
+    z-index:10;
+}
+
+.live-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    background:#e50914;
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    font-size:12px;
+    font-weight:700;
+}
+
+.live-dot{
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+    background:#fff;
+
+    animation:blink 1s infinite;
+}
+
+@keyframes blink{
+    0%{opacity:1}
+    50%{opacity:.3}
+    100%{opacity:1}
+}
+
+.channel-name{
+    margin-top:12px;
+    font-size:28px;
+    font-weight:700;
+}
+
+/* FULLSCREEN */
+
+.fullscreen-btn{
+    position:absolute;
+
+    right:20px;
+    bottom:20px;
+
+    width:52px;
+    height:52px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(0,0,0,.65);
+
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+
+    color:white;
+
+    font-size:24px;
+
+    cursor:pointer;
+
+    z-index:10;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    transition:.3s;
+}
+
+.fullscreen-btn:hover{
+    transform:scale(1.08);
+    background:rgba(0,0,0,.8);
+}
+
+/* SUGGESTED */
+
+.section-title{
+    margin-top:35px;
+    margin-bottom:18px;
+
+    font-size:22px;
+}
+
+.suggested-row{
+    display:flex;
+    gap:15px;
+    overflow-x:auto;
+    padding-bottom:10px;
+}
+
+.suggested-row::-webkit-scrollbar{
+    display:none;
+}
+
+.channel-card{
+    min-width:200px;
+
+    background:#161616;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.channel-card:hover{
+    transform:scale(1.04);
+}
+
+.channel-card img{
+    width:55px;
+    height:55px;
+
+    object-fit:contain;
+}
+
+.channel-card h4{
+    margin-top:10px;
+    font-size:15px;
+}
+
+.channel-card p{
+    margin-top:5px;
+    color:#aaa;
+    font-size:12px;
+}
+body
+
+.footer{
+    text-align:center;
+    padding:35px 20px;
+    margin-top:50px;
+
+    background:rgba(255,255,255,.03);
+    backdrop-filter:blur(20px);
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    color:rgba(255,255,255,.6);
+
+    font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+
+    <div class="logo">
+        NightWave
+    </div>
+
+    <button
+        class="home-btn"
+        onclick="window.location.href='index.html'">
+        Home
+    </button>
+
+</nav>
+
+<div class="player-section">
+
+    <div class="player-wrapper">
+
+        <video
+            id="videoPlayer"
+            autoplay
+            playsinline>
+        </video>
+
+        <div class="overlay">
+
+            <div class="live-tag">
+                <span class="live-dot"></span>
+                LIVE
+            </div>
+
+            <div
+                class="channel-name"
+                id="channelName">
+                Loading...
+            </div>
+
+        </div>
+
+        <button
+    class="fullscreen-btn"
+    onclick="goFullscreen()"
+    title="Fullscreen">
+
+    ⛶
+
+</button>
+
+    </div>
+
+    <h2
+class="section-title"
+id="categoryTitle">
+    More Channels
+</h2>
+
+    <div
+        class="suggested-row"
+        id="suggestedChannels">
+    </div>
+
+</div>
+
+<script>
+
+let hls;
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const channelName =
+params.get("name");
+
+const channelUrl =
+params.get("url");
+
+document.getElementById(
+"channelName"
+).textContent =
+channelName || "Live Channel";
+
+const video =
+document.getElementById(
+"videoPlayer"
+);
+
+if(Hls.isSupported()){
+
+    hls = new Hls({
+        lowLatencyMode:true,
+        liveSyncDurationCount:1,
+        liveMaxLatencyDurationCount:2
+    });
+
+    hls.loadSource(channelUrl);
+    hls.attachMedia(video);
+
+}else{
+
+    video.src = channelUrl;
+
+}
+
+function goFullscreen(){
+
+    const player =
+    document.getElementById(
+    "videoPlayer"
+    );
+
+    if(player.requestFullscreen){
+        player.requestFullscreen();
+    }
+
+}
+
+fetch("channels.json")
+.then(res => res.json())
+.then(channels => {
+
+    const container =
+    document.getElementById(
+    "suggestedChannels"
+    );
+
+    const currentChannel =
+    channels.find(
+    c => c.name === channelName
+    );
+
+    const currentGroup =
+    currentChannel?.group || "Channels";
+
+    document.getElementById(
+    "categoryTitle"
+    ).textContent =
+    `More From ${currentGroup}`;
+
+    const filtered =
+    channels.filter(
+    c => c.group === currentGroup
+    );
+
+    filtered.forEach(channel => {
+
+        const card =
+        document.createElement("div");
+
+        card.className =
+        "channel-card";
+
+        card.innerHTML = `
+            <img
+            src="${channel.logo}"
+            onerror="this.style.display='none'">
+
+            <h4>${channel.name}</h4>
+
+            <p>${channel.group}</p>
+        `;
+
+        card.onclick = () => {
+
+            location.href =
+            `player.html?name=${encodeURIComponent(channel.name)}&url=${encodeURIComponent(channel.url)}`;
+
+        };
+
+        container.appendChild(card);
+
+    });
+
+});
+
+</script>
+<footer class="footer">
+    NightWave © 2026 |
+    <a href="https://wa.me/8801916289218"
+       target="_blank"
+       class="creator-link">
+       APURBO
+    </a>
+</footer>
+</body>
+</html>

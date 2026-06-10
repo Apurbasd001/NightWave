@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NightWave</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+  padding-bottom:90px;
+    background:#0b0b0b;
+    color:#fff;
+}
+
+nav{
+    position:sticky;
+    top:0;
+    z-index:999;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:15px 25px;
+
+    background:rgba(20,20,20,.35);
+
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    color:#e50914;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px 18px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(25px);
+    -webkit-backdrop-filter:blur(25px);
+    color:#fff;
+    outline:none;
+    transition:.3s;
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.08),
+        0 8px 32px rgba(0,0,0,.35);
+}
+
+.search-box input::placeholder{
+    color:rgba(255,255,255,.55);
+}
+
+.search-box input:focus{
+    background:rgba(255,255,255,.12);
+    border-color:rgba(255,255,255,.25);
+}
+
+.search-box input{
+    width:100%;
+    padding:12px 18px;
+
+    background:transparent;
+
+    border:none;
+    outline:none;
+
+    color:white;
+
+    font-size:14px;
+}
+
+.hero{
+    height:420px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:40px;
+    background:
+    linear-gradient(to right,rgba(0,0,0,.95),rgba(0,0,0,.35)),
+    url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1600") center/cover;
+}
+
+.hero h1{
+    font-size:50px;
+    margin-bottom:10px;
+}
+
+.hero p{
+    max-width:500px;
+    opacity:.8;
+    line-height:1.6;
+}
+
+.section{
+    padding:30px;
+}
+
+.section h2{
+    margin-bottom:20px;
+}
+
+.channel-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:15px;
+}
+
+.channel-card{
+    background:#161616;
+    border-radius:14px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:.3s;
+    border:1px solid rgba(255,255,255,.05);
+}
+
+.channel-card:hover{
+    transform:translateY(-4px);
+}
+
+.logo-box{
+    height:110px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#101010;
+}
+
+.logo-box img{
+    max-width:80%;
+    max-height:80px;
+    object-fit:contain;
+}
+
+.channel-info{
+    padding:12px;
+}
+
+.channel-name{
+    font-size:14px;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.live{
+    margin-top:8px;
+    display:inline-block;
+    background:#e50914;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:11px;
+}
+
+.player-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.95);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+}
+
+.player-container{
+    width:95%;
+    max-width:1100px;
+}
+
+.player-container video{
+    width:100%;
+    border-radius:12px;
+}
+
+.close-btn{
+    position:absolute;
+    top:20px;
+    right:25px;
+    font-size:30px;
+    cursor:pointer;
+}
+
+.loading{
+    text-align:center;
+    padding:50px;
+    opacity:.7;
+}
+
+footer{
+    text-align:center;
+    padding:25px;
+    opacity:.5;
+}
+
+@media(max-width:768px){
+
+    nav{
+        flex-direction:column;
+        gap:12px;
+    }
+
+.search-box{
+    width:280px;
+    max-width:100%;
+
+    padding:4px;
+
+    border-radius:40px;
+
+    background:rgba(255,255,255,.06);
+
+    backdrop-filter:blur(30px);
+    -webkit-backdrop-filter:blur(30px);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+    0 8px 32px rgba(0,0,0,.35),
+    inset 0 1px 1px rgba(255,255,255,.08);
+}
+
+    .hero h1{
+        font-size:34px;
+    }
+
+    .hero{
+        height:300px;
+    }
+}
+
+.player-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.live-badge{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    background:#181818;
+    border:1px solid rgba(255,255,255,.08);
+
+    padding:8px 14px;
+
+    border-radius:999px;
+
+    font-size:13px;
+    font-weight:600;
+}
+
+.live-dot{
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#ff0000;
+
+    animation:blink 1s infinite;
+}
+
+@keyframes blink{
+    0%{opacity:1}
+    50%{opacity:.4}
+    100%{opacity:1}
+}
+
+#channelTitle{
+    font-size:18px;
+    font-weight:600;
+}
+
+#videoPlayer{
+    width:100%;
+    border-radius:16px;
+    background:#000;
+}
+.bottom-nav{
+
+    position:fixed;
+    bottom:0;
+    left:0;
+
+    width:100%;
+    height:65px;
+
+    background:#0f0f0f;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+
+    z-index:9999;
+}
+
+.nav-item{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    text-decoration:none;
+
+    color:#aaa;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.nav-item .material-icons{
+
+    font-size:26px;
+    margin-bottom:2px;
+}
+
+.nav-item small{
+
+    font-size:11px;
+}
+
+.nav-item.active{
+
+    color:#fff;
+}
+
+.nav-item:hover{
+
+    color:#fff;
+}
+</style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">NightWave</div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search channels">
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Unlimited Live TV</h1>
+    <p>Watch live television channels instantly with a clean and fast streaming experience.</p>
+</section>
+
+<section class="section">
+    <h2>Live Channels</h2>
+
+    <div id="loading" class="loading">
+        Loading channels...
+    </div>
+
+    <div id="channelGrid" class="channel-grid"></div>
+</section>
+
+
+
+<footer>
+    NightWave © 2026 |
+    <a href="https://wa.me/8801916289218"
+       target="_blank"
+       class="creator-link">
+       [APURBO]
+    </a>
+</footer>
+
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD1Vw0ICJJEHNOHRuPMqJxdQKG5iJnylko",
+  authDomain: "nightwave-72d13.firebaseapp.com",
+  projectId: "nightwave-72d13",
+  storageBucket: "nightwave-72d13.firebasestorage.app",
+  messagingSenderId: "503244425930",
+  appId: "1:503244425930:web:62e927b8686671394fc233"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,(user)=>{
+
+    if(!user){
+        location.href="login.html";
+        return;
+    }
+
+    document.getElementById("userName").textContent =
+    user.displayName || user.email;
+
+});
+
+window.logoutUser = function(){
+
+    signOut(auth).then(()=>{
+        location.href="login.html";
+    });
+
+}
+let allChannels = [];
+
+fetch("channels.json")
+.then(res => res.json())
+.then(data => {
+
+    allChannels = data;
+
+    document.getElementById("loading").style.display = "none";
+
+    renderChannels(allChannels);
+
+})
+.catch(() => {
+
+    document.getElementById("loading").innerHTML =
+    "channels.json file not found";
+
+});
+
+function renderChannels(channels){
+
+    const grid = document.getElementById("channelGrid");
+
+    grid.innerHTML = "";
+
+    channels.forEach(channel => {
+
+        const card = document.createElement("div");
+
+        card.className = "channel-card";
+
+        card.innerHTML = `
+        <div class="logo-box">
+            <img src="${channel.logo || ''}"
+            onerror="this.style.display='none'">
+        </div>
+
+        <div class="channel-info">
+            <div class="channel-name">
+                ${channel.name}
+            </div>
+
+            <div class="live">
+                LIVE
+            </div>
+        </div>
+        `;
+
+        card.onclick = () => {
+    location.href =
+    `player.html?name=${encodeURIComponent(channel.name)}&url=${encodeURIComponent(channel.url)}`;
+};
+
+        grid.appendChild(card);
+
+    });
+
+}
+
+document.getElementById("searchInput")
+.addEventListener("input", function(){
+
+    const value = this.value.toLowerCase();
+
+    const filtered = allChannels.filter(channel =>
+        channel.name.toLowerCase().includes(value)
+    );
+
+    renderChannels(filtered);
+
+});
+
+let hls;
+
+
+function playChannel(channel){
+
+    const modal =
+    document.getElementById("playerModal");
+
+    const video =
+    document.getElementById("videoPlayer");
+
+    const title =
+    document.getElementById("channelTitle");
+
+    title.textContent =
+    channel.name;
+
+    modal.style.display = "flex";
+
+    if(hls){
+        hls.destroy();
+        hls = null;
+    }
+
+    if(Hls.isSupported()){
+
+        hls = new Hls({
+            lowLatencyMode:true,
+            liveSyncDurationCount:1,
+            liveMaxLatencyDurationCount:2
+        });
+
+        hls.loadSource(channel.url);
+
+        hls.attachMedia(video);
+
+    }else{
+
+        video.src = channel.url;
+
+    }
+
+}
+
+function closePlayer(){
+
+    document.getElementById("playerModal")
+    .style.display = "none";
+
+    const video =
+    document.getElementById("videoPlayer");
+
+    video.pause();
+
+    if(hls){
+        hls.destroy();
+    }
+
+}
+
+
+</script>
+<div class="bottom-nav">
+
+    <a href="index.html" class="nav-item active">
+
+        <span class="material-icons">
+            home
+        </span>
+
+        <small>Home</small>
+
+    </a>
+
+    <div class="nav-item"
+         onclick="logoutUser()">
+
+        <span class="material-icons">
+            account_circle
+        </span>
+
+        <small id="userName">
+            Profile
+        </small>
+
+    </div>
+
+</div>
+</body>
+</html>
