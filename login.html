@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NightWave - Sign In</title>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#050505;
+    overflow:hidden;
+}
+
+/* Soft red ambient glow */
+
+body::before{
+    content:"";
+    position:absolute;
+    width:700px;
+    height:700px;
+    background:#e50914;
+    filter:blur(220px);
+    opacity:.12;
+    border-radius:50%;
+    top:-220px;
+    left:-180px;
+}
+
+/* Login Card */
+
+.auth-card{
+    position:relative;
+    width:92%;
+    max-width:430px;
+    padding:42px 34px;
+    border-radius:26px;
+    background:rgba(18,18,18,.75);
+    backdrop-filter:blur(28px);
+    -webkit-backdrop-filter:blur(28px);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:
+    0 25px 80px rgba(0,0,0,.55);
+    z-index:2;
+    animation:fadeUp .6s ease;
+}
+
+/* Branding */
+
+.logo{
+    text-align:center;
+    font-size:36px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#e50914;
+    margin-bottom:8px;
+}
+
+.tagline{
+    text-align:center;
+    color:#9ca3af;
+    font-size:14px;
+    margin-bottom:32px;
+}
+
+/* Tabs */
+
+.tabs{
+    display:flex;
+    gap:10px;
+    margin-bottom:26px;
+}
+
+.tab{
+    flex:1;
+    padding:12px 14px;
+    border-radius:14px;
+    text-align:center;
+    font-weight:600;
+    color:#b0b0b0;
+    background:rgba(255,255,255,.04);
+    cursor:pointer;
+    transition:.25s;
+}
+
+.tab.active{
+    background:rgba(229,9,20,.16);
+    color:#fff;
+    border:1px solid rgba(229,9,20,.35);
+}
+
+/* Forms */
+
+.form{
+    display:none;
+}
+
+.form.active{
+    display:block;
+}
+
+/* Inputs */
+
+.input-group{
+    position:relative;
+    margin-bottom:18px;
+}
+
+.input-group input{
+    width:100%;
+    padding:18px 16px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.05);
+    color:#fff;
+    outline:none;
+    font-size:15px;
+    transition:.25s;
+}
+
+.input-group input:focus{
+    border-color:#e50914;
+    background:rgba(255,255,255,.07);
+}
+
+.input-group label{
+    position:absolute;
+    left:16px;
+    top:17px;
+    color:#888;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label{
+    top:-9px;
+    left:12px;
+    padding:0 6px;
+    background:#121212;
+    font-size:12px;
+    color:#e50914;
+}
+
+/* Buttons */
+
+.primary-btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:#e50914;
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.primary-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 12px 30px rgba(229,9,20,.35);
+}
+
+.google-btn{
+
+    width:100%;
+
+    height:55px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:white;
+
+    color:#111;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    transition:.3s;
+}
+
+.google-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 10px 30px rgba(255,255,255,.15);
+}
+
+.google-btn img{
+
+    width:22px;
+    height:22px;
+}
+
+.google-btn:hover{
+    transform:translateY(-1px);
+}
+
+/* Divider */
+
+.divider{
+    position:relative;
+    text-align:center;
+    margin:22px 0;
+    color:#777;
+    font-size:13px;
+}
+
+.divider::before,
+.divider::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:38%;
+    height:1px;
+    background:rgba(255,255,255,.08);
+}
+
+.divider::before{
+    left:0;
+}
+
+.divider::after{
+    right:0;
+}
+
+/* Message */
+
+.message{
+    margin-top:16px;
+    text-align:center;
+    font-size:14px;
+    min-height:20px;
+}
+
+.error{
+    color:#ff6b6b;
+}
+
+.success{
+    color:#4ade80;
+}
+
+/* Footer */
+
+.footer{
+    text-align:center;
+    margin-top:24px;
+    color:#666;
+    font-size:12px;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(18px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@media(max-width:480px){
+    .auth-card{
+        padding:34px 22px;
+    }
+
+    .logo{
+        font-size:32px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="auth-card">
+
+    <div class="logo">
+        NIGHTWAVE
+    </div>
+
+    <div class="tagline">
+        Stream Without Limits
+    </div>
+
+    <div class="tabs">
+
+        <div class="tab active" id="signInTab">
+            Sign In
+        </div>
+
+        <div class="tab" id="signUpTab">
+            Sign Up
+        </div>
+
+    </div>
+
+    <!-- Sign In Form -->
+
+    <form class="form active" id="signInForm">
+
+        <div class="input-group">
+
+            <input
+            type="email"
+            id="loginEmail"
+            placeholder=" "
+            required>
+
+            <label>Email</label>
+
+        </div>
+
+        <div class="input-group">
+
+            <input
+            type="password"
+            id="loginPassword"
+            placeholder=" "
+            required>
+
+            <label>Password</label>
+
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Continue
+        </button>
+
+        <div class="divider">
+            OR
+        </div>
+
+        <button class="google-btn">
+
+    <img
+    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+    alt="Google">
+
+    Continue with Google
+
+</button>
+
+    </form>
+
+    <!-- Sign Up Form -->
+
+    <form class="form" id="signUpForm">
+
+        <div class="input-group">
+
+            <input
+            type="text"
+            id="signupName"
+            placeholder=" "
+            required>
+
+            <label>Username</label>
+
+        </div>
+
+        <div class="input-group">
+
+            <input
+            type="email"
+            id="signupEmail"
+            placeholder=" "
+            required>
+
+            <label>Email</label>
+
+        </div>
+
+        <div class="input-group">
+
+            <input
+            type="password"
+            id="signupPassword"
+            placeholder=" "
+            required>
+
+            <label>Password</label>
+
+        </div>
+
+        <div class="input-group">
+
+            <input
+            type="password"
+            id="signupConfirmPassword"
+            placeholder=" "
+            required>
+
+            <label>Confirm Password</label>
+
+        </div>
+
+        <button type="submit" class="primary-btn">
+            Create Account
+        </button>
+
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <div class="footer">
+        NightWave © 2026
+    </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    updateProfile,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD1Vw0ICJJEHNOHRuPMqJxdQKG5iJnylko",
+  authDomain: "nightwave-72d13.firebaseapp.com",
+  projectId: "nightwave-72d13",
+  storageBucket: "nightwave-72d13.firebasestorage.app",
+  messagingSenderId: "503244425930",
+  appId: "1:503244425930:web:62e927b8686671394fc233",
+  measurementId: "G-RQRY19NRGV"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+/* Elements */
+
+const signInTab =
+document.getElementById("signInTab");
+
+const signUpTab =
+document.getElementById("signUpTab");
+
+const signInForm =
+document.getElementById("signInForm");
+
+const signUpForm =
+document.getElementById("signUpForm");
+
+const message =
+document.getElementById("message");
+
+/* Auto redirect if already logged in */
+
+onAuthStateChanged(auth,(user)=>{
+
+    if(user){
+        location.href = "index.html";
+    }
+
+});
+
+/* Tab switching */
+
+signInTab.onclick = () => {
+
+    signInTab.classList.add("active");
+    signUpTab.classList.remove("active");
+
+    signInForm.classList.add("active");
+    signUpForm.classList.remove("active");
+
+    message.textContent = "";
+};
+
+signUpTab.onclick = () => {
+
+    signUpTab.classList.add("active");
+    signInTab.classList.remove("active");
+
+    signUpForm.classList.add("active");
+    signInForm.classList.remove("active");
+
+    message.textContent = "";
+};
+
+/* Sign Up */
+
+signUpForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const name =
+    document.getElementById("signupName").value.trim();
+
+    const email =
+    document.getElementById("signupEmail").value.trim();
+
+    const password =
+    document.getElementById("signupPassword").value;
+
+    const confirmPassword =
+    document.getElementById("signupConfirmPassword").value;
+
+    if(password !== confirmPassword){
+
+        message.className = "message error";
+
+        message.textContent =
+        "Passwords do not match";
+
+        return;
+    }
+
+    try{
+
+        const userCredential =
+        await createUserWithEmailAndPassword(auth,email,password);
+
+        await updateProfile(userCredential.user,{
+            displayName:name
+        });
+
+        message.className = "message success";
+
+        message.textContent =
+        "Account created successfully";
+
+        setTimeout(()=>{
+            location.href = "index.html";
+        },1200);
+
+    }catch(err){
+
+        message.className = "message error";
+
+        message.textContent =
+        err.message;
+    }
+
+});
+
+/* Sign In */
+
+signInForm.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const email =
+    document.getElementById("loginEmail").value.trim();
+
+    const password =
+    document.getElementById("loginPassword").value;
+
+    try{
+
+        await signInWithEmailAndPassword(auth,email,password);
+
+        location.href = "index.html";
+
+    }catch(err){
+
+        message.className = "message error";
+
+        message.textContent =
+        "Invalid email or password";
+    }
+
+});
+
+/* Google Login */
+
+document.querySelector(".google-btn")
+.addEventListener("click", async () => {
+
+    try{
+
+        await signInWithPopup(auth,provider);
+
+        location.href = "index.html";
+
+    }catch(err){
+
+        message.className = "message error";
+
+        message.textContent =
+        "Google sign in failed";
+    }
+
+});
+
+</script>
+
+</body>
+</html>
